@@ -52,6 +52,29 @@ public class EmpleadoDAO {
         }
         return empleados;
     }
+    public void eliminarEmpleado(String id) throws SQLException {
+        String sql = "DELETE FROM empleado WHERE id = ?";
+        try (Connection conn = ConexionBD.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            stmt.executeUpdate();
+        }
+    }
+    public void modificarEmpleado(Empleado empleado) throws SQLException {
+        String sql = "UPDATE empleado SET nombre=?, apellido=?, telefono=?, direccion=? WHERE id=?";
+        try (Connection conn = ConexionBD.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, empleado.getNombre());
+            stmt.setString(2, empleado.getApellido());
+            stmt.setString(3, empleado.getTelefono());
+            stmt.setString(4, empleado.getDireccion());
+            stmt.setString(5, empleado.getId());
+
+            stmt.executeUpdate();
+        }
+    }
+
 
     public Empleado buscarPorUsuario(String username) throws SQLException {
         String sql = "SELECT * FROM empleado WHERE nombre_usuario = ?";

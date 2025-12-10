@@ -52,6 +52,21 @@ public class GestorEmpleados {
             return null;
         }
     }
+    public void eliminarEmpleado(String id) {
+        try {
+            empleadoDAO.eliminarEmpleado(id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void modificarEmpleado(Empleado empleado) {
+        try {
+            empleadoDAO.modificarEmpleado(empleado);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void listarEmpleados() {
         List<Empleado> empleados = listarTodos();

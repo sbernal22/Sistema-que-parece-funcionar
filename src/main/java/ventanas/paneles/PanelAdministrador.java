@@ -20,6 +20,9 @@ public class PanelAdministrador extends JPanel {
 
         JToolBar toolbar = new JToolBar();
         JButton btnAgregar = new JButton("Agregar");
+        JButton btnEliminar = new JButton("Eliminar");
+        toolbar.add(btnEliminar);
+
         toolbar.add(btnAgregar);
         add(toolbar, BorderLayout.NORTH);
 
@@ -33,6 +36,8 @@ public class PanelAdministrador extends JPanel {
         add(new JScrollPane(tabla), BorderLayout.CENTER);
 
         btnAgregar.addActionListener(e -> mostrarDialogoAgregar());
+        btnEliminar.addActionListener(e -> eliminarAdministradorSeleccionado());
+
 
         actualizarAdministradores();
     }
@@ -106,6 +111,30 @@ public class PanelAdministrador extends JPanel {
             }
         }
     }
+    private void eliminarAdministradorSeleccionado() {
+        int fila = tabla.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un administrador para eliminar.");
+            return;
+        }
+
+        String dni = (String) tabla.getValueAt(fila, 0);
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "¿Está seguro de eliminar al administrador con DNI: " + dni + "?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            gestorAdministradores.eliminar(dni);
+            actualizarAdministradores();
+            JOptionPane.showMessageDialog(this, "Administrador eliminado.");
+        }
+    }
+
 
     public void actualizarAdministradores() {
         modelo.setRowCount(0);

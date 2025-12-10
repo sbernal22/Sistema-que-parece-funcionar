@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import dao.ClienteDAO;
 import entidades.concretas.Cliente;
+import sistema.SistemaBanco;
 
 public class GestorClientes {
     private final ClienteDAO clienteDAO;
@@ -40,6 +41,24 @@ public class GestorClientes {
             return null;
         }
     }
+    public boolean eliminar(String dni) {
+        try {
+            return clienteDAO.eliminarCliente(dni);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public void actualizarCliente(Cliente cliente) {
+        try {
+            clienteDAO.actualizarCliente(cliente);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void listarClientes() {
         List<Cliente> clientes = listarTodos();

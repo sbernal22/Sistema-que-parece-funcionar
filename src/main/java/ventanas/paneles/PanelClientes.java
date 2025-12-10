@@ -20,6 +20,12 @@ public class PanelClientes extends JPanel {
 
         JToolBar toolbar = new JToolBar();
         JButton btnAgregar = new JButton("Crear");
+        JButton btnEliminar = new JButton("Eliminar");
+        JButton btnModificar = new JButton("Modificar");
+
+        toolbar.add(btnEliminar);
+        toolbar.add(btnModificar);
+
         toolbar.add(btnAgregar);
         add(toolbar, BorderLayout.NORTH);
 
@@ -35,8 +41,124 @@ public class PanelClientes extends JPanel {
         add(new JScrollPane(tabla), BorderLayout.CENTER);
 
         btnAgregar.addActionListener(e -> mostrarDialogoAgregar());
+        btnEliminar.addActionListener(e -> eliminarClienteSeleccionado());
+        btnModificar.addActionListener(e -> modificarCliente());
+
 
         actualizarClientes();
+    }
+    private void eliminarClienteSeleccionado() {
+        int fila = tabla.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar un cliente para eliminar.",
+                    "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String dni = modelo.getValueAt(fila, 0).toString();
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que deseas eliminar al cliente con DNI " + dni + "?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        boolean eliminado = gestorClientes.eliminar(dni);
+
+        if (!eliminado) {
+            JOptionPane.showMessageDialog(this,
+                    "No se puede eliminar un cliente con cuentas, tarjetas o préstamos asociados.",
+                    "Eliminación no permitida",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this,
+                "Cliente eliminado correctamente.");
+
+        actualizarClientes();
+    }
+
+
+    private void modificarCliente() {
+        int fila = tabla.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un cliente para modificar.");
+            return;
+        }
+
+        String dni = (String) tabla.getValueAt(fila, 0);
+        Cliente cliente = gestorClientes.buscarCliente(dni);
+
+        if (cliente == null) {
+            JOptionPane.showMessageDialog(this, "No se pudo encontrar el cliente en la base de datos.");
+            return;
+        }
+
+        JTextField txtNombre = new JTextField(cliente.getNombre());
+        JTextField txtApellido = new JTextField(cliente.getApellido());
+        JTextField txtTelefono = new JTextField(cliente.getTelefono());
+        JTextField txtDireccion = new JTextField(cliente.getDireccion());
+        JTextField txtUsuario = new JTextField(cliente.getNombreUsuario());
+        JPasswordField txtContrasenia = new JPasswordField(cliente.getContrasenia());
+
+        Object[] message = {
+                "Nombre:", txtNombre,
+                "Apellido:", txtApellido,
+                "Teléfono:", txtTelefono,
+                "Dirección:", txtDireccion,
+                "Usuario:", txtUsuario,
+                "Contraseña:", txtContrasenia
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Modificar Cliente", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                String nombre = txtNombre.getText().trim();
+                String apellido = txtApellido.getText().trim();
+                String telefono = txtTelefono.getText().trim();
+                String direccion = txtDireccion.getText().trim();
+                String usuario = txtUsuario.getText().trim();
+                String contrasenia = new String(txtContrasenia.getPassword()).trim();
+
+                // Validaciones (las mismas que crear)
+                if (nombre.length() < 2 || !nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                    JOptionPane.showMessageDialog(this, "Nombre inválido");
+                    return;
+                }
+                if (apellido.length() < 2 || !apellido.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+                    JOptionPane.showMessageDialog(this, "Apellido inválido");
+                    return;
+                }
+                if (!telefono.isEmpty() && !telefono.matches("\\d{9}")) {
+                    JOptionPane.showMessageDialog(this, "Teléfono inválido");
+                    return;
+                }
+                if (usuario.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Usuario obligatorio");
+                    return;
+                }
+
+                // Actualizar objeto
+                Persona p = new Persona(nombre, apellido, dni, telefono, direccion);
+                Cliente actualizado = new Cliente(p, usuario, contrasenia, cliente.getEstado());
+
+                gestorClientes.actualizarCliente(actualizado);
+                actualizarClientes();
+
+                JOptionPane.showMessageDialog(this, "Cliente modificado correctamente.");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error al modificar cliente: " + ex.getMessage());
+            }
+        }
     }
 
     private void mostrarDialogoAgregar() {

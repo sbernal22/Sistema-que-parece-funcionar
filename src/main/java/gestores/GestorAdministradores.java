@@ -27,5 +27,14 @@ public class GestorAdministradores {
             e.printStackTrace();
             return null;
         }
+
     }
+    public void eliminar(String dni) {
+        try {
+            administradorDAO.eliminarAdministrador(dni);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

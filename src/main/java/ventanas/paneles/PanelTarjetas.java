@@ -20,7 +20,10 @@ public class PanelTarjetas extends JPanel {
 
     public PanelTarjetas(Usuario usuario) {
         setLayout(new BorderLayout());
-
+        if (!(usuario instanceof Cliente)) {
+            this.cliente = null;
+            return;
+        }
         this.cliente = (Cliente) usuario;
         this.gestorTarjetas = new GestorTarjetas();
 

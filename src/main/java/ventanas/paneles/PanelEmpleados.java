@@ -20,6 +20,10 @@ public class PanelEmpleados extends JPanel {
 
         JToolBar toolbar = new JToolBar();
         JButton btnAgregar = new JButton("Contratar");
+        JButton btnModificar = new JButton("Modificar");
+        JButton btnEliminar = new JButton("Eliminar");
+        toolbar.add(btnModificar);
+        toolbar.add(btnEliminar);
         toolbar.add(btnAgregar);
         add(toolbar, BorderLayout.NORTH);
 
@@ -33,6 +37,8 @@ public class PanelEmpleados extends JPanel {
         add(new JScrollPane(tabla), BorderLayout.CENTER);
 
         btnAgregar.addActionListener(e -> mostrarDialogoAgregar());
+        btnEliminar.addActionListener(e -> eliminarEmpleado());
+        btnModificar.addActionListener(e -> modificarEmpleado());
 
         actualizarEmpleados();
     }
@@ -102,6 +108,65 @@ public class PanelEmpleados extends JPanel {
             }
         }
     }
+    private void modificarEmpleado() {
+        int fila = tabla.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Selecciona un empleado.");
+            return;
+        }
+
+        String id = modelo.getValueAt(fila, 0).toString();
+        Empleado emp = gestorEmpleados.buscarEmpleado(id);
+
+        if (emp == null) {
+            JOptionPane.showMessageDialog(this, "Error: empleado no encontrado.");
+            return;
+        }
+
+        JTextField txtNombre = new JTextField(emp.getNombre());
+        JTextField txtApellido = new JTextField(emp.getApellido());
+        JTextField txtTelefono = new JTextField(emp.getTelefono());
+        JTextField txtDireccion = new JTextField(emp.getDireccion());
+
+        Object[] msg = {
+                "Nombre:", txtNombre,
+                "Apellido:", txtApellido,
+                "Teléfono:", txtTelefono,
+                "Dirección:", txtDireccion
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, msg, "Modificar Empleado", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            emp.setNombre(txtNombre.getText().trim());
+            emp.setApellido(txtApellido.getText().trim());
+            emp.setTelefono(txtTelefono.getText().trim());
+            emp.setDireccion(txtDireccion.getText().trim());
+
+            gestorEmpleados.modificarEmpleado(emp);
+            actualizarEmpleados();
+        }
+    }
+    private void eliminarEmpleado() {
+        int fila = tabla.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Selecciona un empleado.");
+            return;
+        }
+
+        String id = modelo.getValueAt(fila, 0).toString();
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que deseas eliminar este empleado?",
+                "Confirmar", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            gestorEmpleados.eliminarEmpleado(id);
+            actualizarEmpleados();
+        }
+    }
+
+
 
     public void actualizarEmpleados() {
         modelo.setRowCount(0);

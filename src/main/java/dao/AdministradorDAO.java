@@ -73,4 +73,13 @@ public class AdministradorDAO {
         }
         return null;
     }
+    public void eliminarAdministrador(String dni) throws SQLException {
+        String sql = "DELETE FROM administrador WHERE dni = ?";
+        try (Connection conn = ConexionBD.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, dni);
+            stmt.executeUpdate();
+        }
+    }
+
 }

@@ -22,6 +22,10 @@ public class PanelCuentas extends JPanel {
 
     public PanelCuentas(Usuario usuario) {
         setLayout(new BorderLayout());
+        if (!(usuario instanceof Cliente)) {
+            this.cliente = null;
+            return;
+        }
         this.cliente = (Cliente) usuario;
         this.gestorCuentas = SistemaBanco.getInstance().getGestorCuentas();
 

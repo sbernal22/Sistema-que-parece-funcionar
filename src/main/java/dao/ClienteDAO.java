@@ -73,6 +73,77 @@ public class ClienteDAO {
         }
         return null;
     }
+    public boolean eliminarCliente(String dni) {
+        try (Connection conn = ConexionBD.getConexion()) {
+
+            // 1. Verificar si tiene TARJETAS
+            String sqlTarjetas = "SELECT COUNT(*) FROM tarjeta WHERE dni_cliente = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlTarjetas)) {
+                stmt.setString(1, dni);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        System.out.println("Tiene tarjetas asociadas");
+                        return false; // No se puede eliminar
+                    }
+                }
+            }
+
+            // 2. Verificar si tiene CUENTAS
+            String sqlCuentas = "SELECT COUNT(*) FROM cuenta WHERE dni_cliente = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlCuentas)) {
+                stmt.setString(1, dni);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        System.out.println("Tiene cuentas asociadas");
+                        return false;
+                    }
+                }
+            }
+
+            // 3. Verificar si tiene PRÉSTAMOS
+            String sqlPrestamos = "SELECT COUNT(*) FROM prestamo WHERE dni_cliente = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlPrestamos)) {
+                stmt.setString(1, dni);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        System.out.println("Tiene préstamos asociados");
+                        return false;
+                    }
+                }
+            }
+
+            String sqlEliminar = "DELETE FROM cliente WHERE dni = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlEliminar)) {
+                stmt.setString(1, dni);
+                stmt.executeUpdate();
+            }
+
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public void actualizarCliente(Cliente cliente) throws SQLException {
+        String sql = "UPDATE cliente SET nombre=?, apellido=?, telefono=?, direccion=?, nombre_usuario=?, contrasenia=? WHERE dni=?";
+        try (Connection conn = ConexionBD.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, cliente.getNombre());
+            stmt.setString(2, cliente.getApellido());
+            stmt.setString(3, cliente.getTelefono());
+            stmt.setString(4, cliente.getDireccion());
+            stmt.setString(5, cliente.getNombreUsuario());
+            stmt.setString(6, cliente.getContrasenia());
+            stmt.setString(7, cliente.getDNI());
+
+            stmt.executeUpdate();
+        }
+    }
+
 
     public void actualizarUsuario(String dni, String nombreUsuario, String contrasenia) throws SQLException {
         String sql = "UPDATE cliente SET nombre_usuario = ?, contrasenia = ? WHERE dni = ?";
