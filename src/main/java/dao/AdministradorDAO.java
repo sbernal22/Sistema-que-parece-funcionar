@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import bd.ConexionBD;
 import entidades.concretas.Administrador;
+import entidades.concretas.Cliente;
 
 public class AdministradorDAO {
 
@@ -49,5 +50,27 @@ public class AdministradorDAO {
             }
         }
         return administradores;
+    }
+    public Administrador buscarPorUsuario(String username) throws SQLException {
+        String sql = "SELECT * FROM administrador WHERE nombre_usuario = ?";
+        try (Connection conn = ConexionBD.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Administrador(
+                            rs.getString("nombre"),
+                            rs.getString("apellido"),
+                            rs.getString("dni"),
+                            rs.getString("telefono"),
+                            rs.getString("direccion"),
+                            rs.getString("nombre_usuario"),
+                            rs.getString("contrasenia"),
+                            rs.getBoolean("estado")
+                    );
+                }
+            }
+        }
+        return null;
     }
 }

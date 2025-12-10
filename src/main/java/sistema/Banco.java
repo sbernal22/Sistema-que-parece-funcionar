@@ -1,11 +1,9 @@
 package sistema;
 
-import gestores.GestorCajeros;
-import gestores.GestorClientes;
-import gestores.GestorCuentas;
-import gestores.GestorEmpleados;
-import gestores.GestorMovimientos;
-import gestores.GestorUsuarios;
+import entidades.enumerables.TipoPermiso;
+import gestores.*;
+
+import java.util.List;
 
 public class Banco {
 
@@ -14,6 +12,7 @@ public class Banco {
     private final GestorEmpleados gestorEmpleados;
     private final GestorCajeros gestorCajeros;
     private final GestorUsuarios gestorUsuarios;
+    private GestorPermisos gestorPermisos;
     private final GestorCuentas gestorCuentas;
 
     public Banco() {
@@ -23,6 +22,16 @@ public class Banco {
         this.gestorMovimientos = new GestorMovimientos();
         this.gestorCuentas = new GestorCuentas();
         this.gestorUsuarios = new GestorUsuarios();
+        this.gestorPermisos = new GestorPermisos();
+        inicializarPermisos();
+    }
+    private void inicializarPermisos() {
+        gestorPermisos.agregarPermisos(List.of(TipoPermiso.values()));
+        gestorPermisos.modificarPermisosByRol("Administrador",
+                List.of(TipoPermiso.values()));
+        gestorPermisos.modificarPermisosByRol("Empleado",
+                List.of(TipoPermiso.TARJ, TipoPermiso.CUEN, TipoPermiso.MOVI, TipoPermiso.CLIE));
+        gestorPermisos.modificarPermisosByRol("Cliente", List.of(TipoPermiso.TARJ, TipoPermiso.CUEN, TipoPermiso.MOVI));
     }
 
     public GestorMovimientos getGestorMovimientos() {

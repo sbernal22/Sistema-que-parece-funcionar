@@ -8,6 +8,7 @@ import sistema.SistemaBanco;
 public class Membership {
     public boolean validateUser(String username, String password) {
         Usuario usuario = SistemaBanco.getInstance().getGestorUsuarios().buscarPorUsuario(username);
+
         return usuario != null && util.PasswordUtil.checkPassword(password, usuario.getContrasenia());
     }
 

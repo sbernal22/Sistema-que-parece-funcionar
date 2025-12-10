@@ -3,6 +3,8 @@ package gestores;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import dao.AdministradorDAO;
 import dao.ClienteDAO;
 import dao.EmpleadoDAO;
 import entidades.concretas.Cliente;
@@ -13,10 +15,12 @@ import entidades.concretas.Usuario;
 public class GestorUsuarios {
     private final ClienteDAO clienteDAO;
     private final EmpleadoDAO empleadoDAO;
+    private final AdministradorDAO administradorDAO;
 
     public GestorUsuarios() {
         this.clienteDAO = new ClienteDAO();
         this.empleadoDAO = new EmpleadoDAO();
+        this.administradorDAO = new  AdministradorDAO();
     }
 
     public List<Usuario> listarTodos() {
@@ -46,6 +50,9 @@ public class GestorUsuarios {
             Usuario usuario = clienteDAO.buscarPorUsuario(username);
             if (usuario == null) {
                 usuario = empleadoDAO.buscarPorUsuario(username);
+                if(usuario == null) {
+                    usuario = administradorDAO.buscarPorUsuario(username);
+                }
             }
             return usuario;
         } catch (SQLException e) {
